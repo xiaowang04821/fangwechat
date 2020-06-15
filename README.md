@@ -5,7 +5,7 @@
 + 目前适配h5、app，建议自行运行到app上查看，效果更佳。小程序暂无适配，不过可以演示基本功能。
 + 技术栈：`vue`+[uview](https://www.uviewui.com/components/intro.html)(适用于uniapp的前端ui库)+`js`+`vuex`
 + 码云：https://gitee.com/xiaowang0482/wechat
-运行截图
++ 运行截图
 
 ![聊天](https://s1.ax1x.com/2020/06/10/tTQltK.png "聊天")
 ![朋友圈](https://s1.ax1x.com/2020/06/10/tTlMuj.png "朋友圈")

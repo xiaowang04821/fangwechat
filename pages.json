@@ -160,13 +160,13 @@
 			}
         },
 		{
-			"path": "node_modules/uview-ui/components/u-avatar-cropper/u-avatar-cropper",
+			"path": "components/u-avatar-cropper/u-avatar-cropper",
 			"style": {
 				"navigationBarTitleText": "选择背景图",
 				"navigationBarBackgroundColor": "#000000"
 			}
-		}
-        ,{
+		},
+		{
             "path" : "pages/builtinBgImg/builtinBgImg",
             "style" : {
 				"navigationBarTitleText": "选择背景图",

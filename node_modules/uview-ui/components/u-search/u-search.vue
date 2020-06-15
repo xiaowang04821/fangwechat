@@ -33,7 +33,7 @@
 				}, inputStyle]"
 			/>
 			<view class="u-close-wrap" v-if="keyword && clearabled && focused" @touchstart="clear">
-				<u-icon class="u-clear-icon" name="close" :size="16" color="#fff" @touchstart="clear"></u-icon>
+				<u-icon class="u-clear-icon" name="close-circle-fill" size="34" color="#c0c4cc"></u-icon>
 			</view>
 		</view>
 		<view :style="[actionStyle]" class="u-action" 
@@ -58,6 +58,7 @@
  * @property {String} action-text 右侧控件文字（默认“搜索”）
  * @property {Object} action-style 右侧控件的样式，对象形式
  * @property {String} input-align 输入框内容水平对齐方式（默认left）
+ * @property {Object} input-style 自定义输入框样式，对象形式
  * @property {Boolean} disabled 是否启用输入框（默认false）
  * @property {String} search-icon-color 搜索图标的颜色，默认同输入框字体颜色
  * @property {String} color 输入框字体颜色（默认#606266）
@@ -71,6 +72,7 @@
  * @event {Function} change 输入框内容发生变化时触发
  * @event {Function} search 用户确定搜索时触发，用户按回车键，或者手机键盘右下角的"搜索"键时触发
  * @event {Function} custom 用户点击右侧控件时触发
+ * @event {Function} clear 用户点击清除按钮时触发
  * @example <u-search placeholder="日照香炉生紫烟" v-model="keyword"></u-search>
  */
 export default {
@@ -230,6 +232,7 @@ export default {
 		// 也可以作为用户通过this.$refs形式调用清空输入框内容
 		clear() {
 			this.keyword = '';
+			this.$emit('clear');
 		},
 		// 确定搜索
 		search() {
@@ -288,12 +291,11 @@ export default {
 }
 
 .u-close-wrap {
-	width: 34rpx;
-	height: 34rpx;
+	width: 40rpx;
+	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: rgb(200, 203, 204);
 	border-radius: 50%;
 }
 

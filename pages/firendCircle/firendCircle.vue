@@ -79,12 +79,12 @@
 			<view :style="{ height: showInput ? '100rpx' : 0 }"></view>
 			<!-- #endif -->
 			<!-- #ifdef APP-PLUS -->
-			<view v-show="showInput" :style="{ height: viewOffsetBottom + 'px' }"></view>
+			<view v-if="showInput" :style="{ height: viewOffsetBottom + 'px' }"></view>
 			<!-- #endif -->
 		</view>
 
 		<!-- 底部聊天输入框 其实可以封装成组件的...-->
-		<view class="input-box" v-show="showInput" id="input-box" :style="{ bottom: inputOffsetBottom > 0 ? inputOffsetBottom + 'px' : '0' }">
+		<view class="input-box" v-if="showInput" id="input-box" :style="{ bottom: inputOffsetBottom > 0 ? inputOffsetBottom + 'px' : '0' }">
 			<view class="input-box-flex">
 				<view class="input-box-flex-grow">
 					<input
@@ -268,7 +268,9 @@ export default {
 			uni.previewImage({
 				current,
 				urls: imgList,
+				// #ifndef MP-WEIXIN
 				indicator: 'number'
+				// #endif
 			});
 		},
 		closeInputModel() {
@@ -350,7 +352,7 @@ image {
 		position: relative;
 		.bgimg {
 			width: 100%;
-			height: 600rpx;
+			height: 560rpx;
 		}
 		.headimg {
 			width: 110rpx;

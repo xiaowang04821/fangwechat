@@ -20,7 +20,7 @@ export default {
 	methods: {
 		chooseImg() {
 			this.$u.route({
-				url: 'node_modules/uview-ui/components/u-avatar-cropper/u-avatar-cropper',
+				url: 'components/u-avatar-cropper/u-avatar-cropper',
 				params: {
 					destWidth: uni.upx2px(750),
 					rectWidth: uni.upx2px(500),
