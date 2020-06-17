@@ -1,5 +1,12 @@
 <template>
 	<view class="content" id="content">
+		<!-- #ifdef MP-WEIXIN -->
+		<u-navbar title=" " :background="{ background: '#f8f8f8'}" :border-bottom="false">
+			<view class="slot-wrap" slot="right">
+				<u-icon name="camera-fill" size="36" @click="linkToRelease"></u-icon>
+			</view>		
+		</u-navbar>
+		<!-- #endif -->
 		<view class="content-imgbox">
 			<image class="bgimg" :src="_user_info.pictureBanner" mode="scaleToFill" @tap="showSheet"></image>
 			<image class="headimg" :src="_user_info.headImg" @tap="linkToBusinessCard(_user_info.id)"></image>
@@ -79,12 +86,12 @@
 			<view :style="{ height: showInput ? '100rpx' : 0 }"></view>
 			<!-- #endif -->
 			<!-- #ifdef APP-PLUS -->
-			<view v-if="showInput" :style="{ height: viewOffsetBottom + 'px' }"></view>
+			<view v-show="showInput" :style="{ height: viewOffsetBottom + 'px' }"></view>
 			<!-- #endif -->
 		</view>
 
 		<!-- 底部聊天输入框 其实可以封装成组件的...-->
-		<view class="input-box" v-if="showInput" id="input-box" :style="{ bottom: inputOffsetBottom > 0 ? inputOffsetBottom + 'px' : '0' }">
+		<view class="input-box" v-if="showInput" id="input-box" :style="{ bottom: inputOffsetBottom > 0 ? inputOffsetBottom + 'px' : '0' }" >
 			<view class="input-box-flex">
 				<view class="input-box-flex-grow">
 					<input
@@ -100,6 +107,7 @@
 						:placeholder="placeholder"
 						:focus="showInput"
 						@blur="blurInput"
+						@confirm="sendMsg"
 					/>
 				</view>
 				<button class="btn" type="primary" size="mini" @touchend.prevent="sendMsg">发送</button>
@@ -117,7 +125,9 @@ export default {
 	data() {
 		return {
 			show: false, //u-action-sheet  show
-			list: [{ text: '更换相册封面', fontSize: '28' }],
+			list: [
+				{ text: '更换相册封面', fontSize: '28' },
+			],
 			content: '',
 			placeholder: '',
 			showInput: false,
@@ -126,20 +136,21 @@ export default {
 			commentInfo: {},
 			inputOffsetBottom: 0, //键盘的高度
 			viewOffsetBottom: 0, //视窗距离页面的距离
-			sel: '' //选中的节点
+			sel: '', //选中的节点
 		};
 	},
 	watch: {
 		inputOffsetBottom: {
 			handler(val) {
-				// #ifdef APP-PLUS
-				//暂时不支持h5的滚动方式 因为h5不支持键盘的高度监听
 				if (val != 0) {
 					this.$nextTick(() => {
+						//暂时不支持h5的滚动方式 因为h5不支持键盘的高度监听
+						//微信小程序会把input的焦点和placeholder顶起，正在寻找解决方案
+						// #ifndef MP-WEIXIN || H5
 						this.bindScroll(this.sel, 100);
+						// #endif
 					});
 				}
-				// #endif
 			}
 		}
 	},
@@ -198,7 +209,7 @@ export default {
 			} else {
 				this.sel = `#comment-${'null'}-${index}`;
 			}
-			this.showInput = true;
+			this.showInput = true;	
 		},
 		//发送消息
 		sendMsg() {
@@ -236,7 +247,8 @@ export default {
 			});
 			this.closeInputModel();
 		},
-		//将视图滚动到键盘的上方
+		//将视图滚动到键盘的上方 微信小程序有些许bug 会把输入框的焦点和placeholder顶起... 、
+		//暂时不适配微信小程序，正在解决此bug
 		bindScroll(sel, duration = 0) {
 			uni.createSelectorQuery()
 				.select('#content')
@@ -245,6 +257,7 @@ export default {
 					uni.createSelectorQuery()
 						.select(sel)
 						.boundingClientRect(res => {
+							console.log(res);
 							if (!res) return;
 							//选中的节点
 							let windowHeight = 0;
@@ -273,6 +286,7 @@ export default {
 				// #endif
 			});
 		},
+		//关闭键盘 关闭输入框
 		closeInputModel() {
 			this.showInput = false;
 			this.content = '';
@@ -280,6 +294,7 @@ export default {
 			this.commentInfo = {};
 			uni.hideKeyboard();
 		},
+		//失去焦点触发
 		blurInput() {
 			this.closeInputModel();
 		},
@@ -303,10 +318,15 @@ export default {
 				}, 500);
 			});
 		},
+		//点击相册封面弹窗选择项
 		clickAction(index) {
 			if (index == 0) {
 				this.$u.route('pages/chooseBgImg/chooseBgImg');
 			}
+		},
+		//点击自定义组件相机按钮
+		linkToRelease(){
+			this.$u.route('pages/releaseFirendCircle/releaseFirendCircle');
 		}
 	},
 	onReady() {
@@ -323,12 +343,13 @@ export default {
 			this.inputOffsetBottom = res.height;
 			this.viewOffsetBottom = res.height + uni.upx2px(100);
 			if (res.height == 0) {
+				// #ifndef MP-WEIXIN
 				this.showInput = false;
+				// #endif
+
 			}
 		});
 	},
-	onShow() {},
-
 	//下拉刷新
 	async onPullDownRefresh() {
 		await this.getData();
@@ -348,6 +369,7 @@ image {
 	will-change: transform;
 }
 .content {
+
 	&-imgbox {
 		position: relative;
 		.bgimg {
@@ -503,10 +525,16 @@ image {
 		box-sizing: content-box;
 		z-index: 999;
 		background-color: $uni-bg-color-grey;
-
+		
+		/* #ifdef MP-WEIXIN */
+		padding-bottom: 0rpx;
+		/* #endif */
+		
+		/* #ifndef MP-WEIXIN */
 		margin-bottom: 0rpx;
 		margin-bottom: constant(safe-area-inset-bottom);
 		margin-bottom: env(safe-area-inset-bottom);
+		/* #endif */
 		&-flex {
 			display: flex;
 			justify-content: flex-start;
@@ -541,6 +569,11 @@ image {
 		color: gray;
 		padding: 35rpx 30rpx 35rpx 100rpx;
 		text-align: right;
+	}
+	.slot-wrap {
+		display: flex;
+		align-items: center;
+		padding: 0 30rpx; 
 	}
 }
 </style>

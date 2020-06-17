@@ -1,5 +1,22 @@
 <template>
 	<view class="">
+		<!-- #ifdef MP-WEIXIN -->
+		<u-navbar title=" " :background="{ background: '#f8f8f8' }">
+			<view class="slot-wrap">
+				<u-search
+					:focus="true"
+					@custom="clickCancel"
+					placeholder="搜索..."
+					shape="square"
+					:action-style="{ color: '#007aff' }"
+					action-text="取消"
+					:bg-color="'#ffffff'"
+					v-model="search_word"
+				></u-search>
+			</view>
+		</u-navbar>
+		<!-- #endif -->
+		<!-- #ifndef MP-WEIXIN -->
 		<view class="status_bar"></view>
 		<view class="content_search">
 			<u-search
@@ -10,16 +27,19 @@
 				:action-style="{ color: '#007aff' }"
 				action-text="取消"
 				:bg-color="'#ffffff'"
-				id="input"
+				v-model="search_word"
 			></u-search>
 		</view>
+		<!-- #endif -->
 	</view>
 </template>
 
 <script>
 export default {
 	data() {
-		return {};
+		return {
+			search_word: ''
+		};
 	},
 
 	methods: {

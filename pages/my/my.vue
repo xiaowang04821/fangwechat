@@ -1,6 +1,11 @@
 <template>
 	<view class="content">
+		<!-- #ifdef MP-WEIXIN -->
+		<u-navbar :is-back="false" title=" " :background="{ background: '#ffffff'  }" :border-bottom="false"></u-navbar>
+		<!-- #endif -->
+		<!-- #ifndef MP-WEIXIN -->
 		<view class="status_bar"></view>
+		<!-- #endif -->
 		<view class="header">
 			<view class="header_left">
 				<image mode="aspectFill" :src="_user_info.headImg" />

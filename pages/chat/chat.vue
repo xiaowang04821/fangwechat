@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<view class="content-box" @touchstart="touchstart" >
+		<view class="content-box" @touchstart="touchstart" id="content-box">
 			<!-- 背景图- 定位方式 -->
 			<image class="content-box-bg" :src="_user_info.chatBgImg" :style="{height:imgHeight}"></image>
 			<view class="content-box-loading" v-if="!loading"><u-loading mode="flower"></u-loading></view>
@@ -12,7 +12,7 @@
 			</view>
 		</view>
 		<!-- 底部聊天输入框 -->
-		<view class="input-box">
+		<view class="input-box" :class="{'input-box-mpInputMargin':mpInputMargin}">
 			<view class="input-box-flex">
 				<view class="input-box-flex-grow">
 					<input
@@ -23,8 +23,9 @@
 						:hold-keyboard="true"
 						:confirm-type="'send'"
 						:confirm-hold="true"
-						placeholder-style="color:#DDD;"
+						placeholder-style="color:#DDDDDD;"
 						:cursor-spacing="6"
+						@confirm="sendMsg"
 					/>
 				</view>
 					<!--icon等组件 后续可能会改为nvue 因为vue不支持confirm-type-->
@@ -48,7 +49,8 @@ export default {
 			},
 			messageList: [],
 			loading: true, //标识是否正在获取数据
-			imgHeight:'1000px'
+			imgHeight:'1000px',
+			mpInputMargin:false, //适配微信小程序 底部输入框高度被顶起的问题
 		};
 	},
 	methods: {
@@ -63,7 +65,7 @@ export default {
 			const { index } = this.formData;
 			const sel = `#msg-${index > 1 ? this.messageList[0].hasBeenSentId : data[data.length - 1].hasBeenSentId}`;
 			this.messageList = [...data, ...this.messageList];
-			//填充数据后，视图会自动滚动到最上面一层然后瞬间再跳回bindScroll的制定未知 ---体验不是很好，后期优化
+			//填充数据后，视图会自动滚动到最上面一层然后瞬间再跳回bindScroll的指定位置 ---体验不是很好，后期优化
 			this.$nextTick(() => {
 				this.bindScroll(sel);
 				//如果还有数据
@@ -113,6 +115,7 @@ export default {
 				}, 500);
 			});
 		},
+		//发送消息
 		sendMsg() {
 			if (!this.$u.trim(this.formData.content)) {
 				return;
@@ -131,15 +134,23 @@ export default {
 				this.formData.content = '';
 				uni.pageScrollTo({
 					scrollTop:99999,
-					duration:100
+					// #ifdef MP-WEIXIN
+					duration:0, //小程序如果有滚动效果 input的焦点也会随着页面滚动...
+					// #endif
+					// #ifndef MP-WEIXIN
+					duration:100,
+					// #endif
 				})
-				
+				// #ifdef MP-WEIXIN
+				this.mpInputMargin = true;
+				// #endif
 				//h5浏览器并没有很好的办法控制键盘一直处于唤起状态 而且会有样式性的问题
 				// #ifdef H5
 					uni.hideKeyboard()
 				// #endif
 			});
 		},
+		//用户触摸屏幕的时候隐藏键盘
 		touchstart(){
 			uni.hideKeyboard()
 		},
@@ -167,6 +178,7 @@ export default {
 			})
 		}
 	},
+	//返回按钮事件
 	onBackPress(e){
 		//以下内容对h5不生效
 		//--所以如果用浏览器自带的返回按钮进行返回的时候页面不会重定向 正在寻找合适的解决方案
@@ -203,6 +215,13 @@ export default {
 			}
 		})
 		
+		// #ifdef MP-WEIXIN
+		uni.onKeyboardHeightChange(res => {
+		  if(res.height == 0){
+			   this.mpInputMargin = false;
+		  }
+		})
+		// #endif
 	}
 };
 </script>
@@ -220,18 +239,34 @@ page {
 		padding-bottom: 100rpx;
 		position: relative;
 		
-		// 底部安全区域
+		/* #ifdef APP-PLUS */
 		margin-bottom: 0rpx;
 		margin-bottom: constant(safe-area-inset-bottom);
 		margin-bottom: env(safe-area-inset-bottom);
+		/* #endif */
+		/* #ifdef MP-WEIXIN */
+		padding-bottom: 0rpx;
+		// padding-bottom: constant(safe-area-inset-bottom);
+		// padding-bottom: env(safe-area-inset-bottom);
+		padding-bottom:calc(100rpx + constant(safe-area-inset-bottom)) ;
+		padding-bottom:calc(100rpx + env(safe-area-inset-bottom)) ;
+		/* #endif */
 		
 		&-bg{
 			width: 100%;
 			// height:calc(100vh - env(safe-area-inset-top) - 100rpx) !important;
 			// min-height:calc(100vh - env(safe-area-inset-top) - 100rpx) ;
 			position: fixed;
+			/* #ifdef MP-WEIXIN */
+			bottom: 0 ;
+			bottom: constant(safe-area-inset-bottom);
+			bottom: env(safe-area-inset-bottom);
+			/* #endif */
+			/* #ifndef MP */
 			top: 0;
 			left: 0;
+			/* #endif */
+			
 		}
 		&-loading {
 			text-align: center;
@@ -312,13 +347,19 @@ page {
 		width: 100%;
 		box-sizing: content-box;
 		z-index: 999;
-		// background-color: #F3F3F3;
 		background-color: $uni-bg-color-grey;
-		// border-top: 1rpx solid #c8c9cc;
-
+		
+		/* #ifdef APP-PLUS */
 		margin-bottom: 0rpx;
 		margin-bottom: constant(safe-area-inset-bottom);
 		margin-bottom: env(safe-area-inset-bottom);
+		/* #endif */
+		/* #ifdef MP-WEIXIN */
+		padding-bottom:0rpx;
+		padding-bottom:constant(safe-area-inset-bottom) ;
+		padding-bottom:env(safe-area-inset-bottom) ;
+		/* #endif */
+		
 		&-flex {
 			display: flex;
 			justify-content: flex-start;
@@ -345,6 +386,11 @@ page {
 				// height: 60rpx;
 			}
 		}
+	}
+	.input-box-mpInputMargin{
+		/* #ifdef MP */
+		padding-bottom:0rpx;
+		/* #endif */
 	}
 }
 </style>

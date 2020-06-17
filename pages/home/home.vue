@@ -1,6 +1,14 @@
 <template>
 	<view class="content">
-		<selectInput :list="selectList" :list-key="'name'" :show.sync="selectShow" @on-select="checkSelect" />
+		<!-- #ifdef MP-WEIXIN -->
+		<u-navbar :is-back="false" title="微信" :background="{ background: '#f8f8f8'  }" title-color="#404133" :border-bottom="false" z-index="1001">
+			<view class="slot-wrap" slot="right">
+				<u-icon name="plus-circle" size="36" @click="showSelect"></u-icon>
+			</view>		
+		</u-navbar>
+		<!-- #endif -->
+		
+		<selectInput :list="selectList" :list-key="'name'" :show.sync="selectShow" @on-select="checkSelect" @close="closeSelect" />
 		<searchInput />
 		<u-swipe-action :show="item.show" :index="index" v-for="(item, index) in list" btn-width="160" :key="item.id" @click="click" @open="open" :options="options">
 			<view class="item" :class="item.isTop ? 'bg_view' : ''" hover-class="message-hover-class" @tap="linkTo(item)">
@@ -69,28 +77,42 @@ export default {
 		};
 	},
 	methods: {
+		//打开或者关闭弹窗
+		showSelect(){
+			this.selectShow = !this.selectShow;
+		},
+		//action 点击事件
 		click(index, index1) {
 			if (index1 == 0) {
 				this.list.splice(index, 1);
 			} 
 		},
+		//action 打开事件
 		open(index) {
 			this.list[index].show = true;
 			this.list.map((val, idx) => {
 				if (index != idx) this.list[idx].show = false;
 			});
 		},
+		//点击导航栏自定义按钮
 		onNavigationBarButtonTap({ index }) {
 			if (index == 0) {
-				this.selectShow = !this.selectShow;
+				this.showSelect()
 			}
 		},
+		//跳转
 		linkTo({ id, name, images ,userId }) {
 			this.$u.route({
 				url: 'pages/chat/chat',
 				params: { messageId: id,fromUserId:userId}
 			});
 		},
+		//关闭弹窗
+		closeSelect(){
+			//小程序兼容
+			this.selectShow = false;
+		},
+		//扫码
 		checkSelect(index) {
 			if (index == 1) {
 				uni.vibrateLong();
@@ -104,9 +126,6 @@ export default {
 			}
 		},
 	},
-	onShow() {
-		
-	}
 };
 </script>
 
@@ -154,6 +173,11 @@ export default {
 	}
 	.bg_view {
 		background-color: #fafafa;
+	}
+	.slot-wrap {
+		display: flex;
+		align-items: center;
+		padding: 0 30rpx; 
 	}
 }
 </style>

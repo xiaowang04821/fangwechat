@@ -3,20 +3,23 @@
 		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		{
-			"path": "pages/index/index",
-			"style": {
-				// "navigationBarTitleText": "登录"
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleView": false
-				}
-			}
-		},
+		// {
+		// 	"path": "pages/index/index",
+		// 	"style": {
+		// 		// "navigationBarTitleText": "登录"
+		// 		"navigationStyle": "custom",
+		// 		"app-plus": {
+		// 			"titleView": false
+		// 		}
+		// 	}
+		// },
 		{
 			"path": "pages/home/home",
 			"style": {
 				"navigationBarTitleText": "微信",
+				// #ifdef MP-WEIXIN
+				"navigationStyle": "custom",
+				// #endif
 				"app-plus": {
 					"titleNView": {
 						"buttons": [{
@@ -49,6 +52,7 @@
 		}, {
 			"path": "pages/my/my",
 			"style": {
+				"navigationBarTitleText": " ",
 				"navigationStyle": "custom",
 				"app-plus": {
 					"titleView": false
@@ -57,6 +61,7 @@
 		}, {
 			"path": "pages/search/search",
 			"style": {
+				"navigationBarTitleText": "",
 				"navigationStyle": "custom",
 				"app-plus": {
 					"titleView": false,
@@ -91,7 +96,10 @@
 		}, {
 			"path": "pages/firendCircle/firendCircle",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": " ",
+				// #ifdef MP-WEIXIN
+				"navigationStyle": "custom",
+				// #endif
 				"transparentTitle": "auto",
 				"enablePullDownRefresh": true,
 				"app-plus": {
@@ -141,6 +149,9 @@
             "path" : "pages/releaseFirendCircle/releaseFirendCircle",
             "style" : {
 				"navigationBarTitleText": "",
+				// #ifdef MP-WEIXIN
+				"navigationStyle": "custom",
+				// #endif
 				"app-plus": {
 					"titleNView": {
 						"buttons": [{
@@ -170,6 +181,9 @@
             "path" : "pages/builtinBgImg/builtinBgImg",
             "style" : {
 				"navigationBarTitleText": "选择背景图",
+				// #ifdef MP-WEIXIN
+				"navigationStyle": "custom",
+				// #endif
 				"app-plus": {
 					"titleNView": {
 						"buttons": [{
