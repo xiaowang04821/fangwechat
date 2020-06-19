@@ -1,0 +1,314 @@
+page {
+	background-color: #f3f3f3;
+}
+
+.content {
+	&-box {
+		width: 100%;
+		height: auto;
+		min-height: calc(100vh - env(safe-area-inset-top) - 200rpx);
+		box-sizing: content-box;
+		padding-bottom: 130rpx;
+		position: relative;
+
+		/* #ifdef APP-PLUS */
+		margin-bottom: 0rpx;
+		margin-bottom: constant(safe-area-inset-bottom);
+		margin-bottom: env(safe-area-inset-bottom);
+		/* #endif */
+		/* #ifdef MP-WEIXIN */
+		padding-bottom: 0rpx;
+		padding-bottom: calc(130rpx + constant(safe-area-inset-bottom));
+		padding-bottom: calc(130rpx + env(safe-area-inset-bottom));
+		/* #endif */
+
+		&-bg {
+			width: 100%;
+			// height:calc(100vh - env(safe-area-inset-top) - 100rpx) !important;
+			// min-height:calc(100vh - env(safe-area-inset-top) - 100rpx) ;
+			position: fixed;
+			/* #ifdef MP-WEIXIN */
+			bottom: 0;
+			bottom: constant(safe-area-inset-bottom);
+			bottom: env(safe-area-inset-bottom);
+			/* #endif */
+			/* #ifndef MP */
+			top: 0;
+			left: 0;
+			/* #endif */
+		}
+
+		&-loading {
+			text-align: center;
+			padding: 20rpx 0;
+		}
+
+		.message {
+			padding: 14rpx 20rpx;
+		}
+
+		.message-item {
+			display: flex;
+			justify-content: flex-start;
+			align-items: flex-start;
+			align-content: flex-start;
+			flex-wrap: nowrap;
+			flex-direction: row;
+
+			.img {
+				width: 80rpx;
+				height: 80rpx;
+				border-radius: 5rpx;
+			}
+
+			.content {
+				padding: 20rpx;
+				max-width: 500rpx;
+				border-radius: 10rpx;
+				font-size: 28rpx;
+			}
+
+			.contentType2 {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				.voice_icon {
+					height: 34rpx;
+					width: 34rpx; 
+					background-repeat: no-repeat;
+					background-size: 100%;
+				}
+				.voice_icon_right {
+					background-image: url(../../static/voice-left-3.png);
+					margin-left: 10rpx;
+				}
+				.voice_icon_left {
+					background-image: url(../../static/voice-right-3.png);
+					margin-right: 10rpx;
+				}
+				.voice_icon_right_an {
+					animation: voiceAn_right 1s linear alternate infinite;
+				}
+				.voice_icon_left_an {
+					animation: voiceAn_left 1s linear alternate infinite;
+				}
+				@keyframes voiceAn_right {
+					0% {
+						background-image: url(../../static/voice-left-1.png);
+					}
+					50% {
+						background-image: url(../../static/voice-left-2.png);
+					}
+					100% {
+						background-image: url(../../static/voice-left-3.png);
+					}
+				}
+				@keyframes voiceAn_left {
+					0% {
+						background-image: url(../../static/voice-right-1.png);
+					}
+					50% {
+						background-image: url(../../static/voice-right-2.png);
+					}
+					100% {
+						background-image: url(../../static/voice-right-3.png);
+					}
+				}
+			}
+
+			.content-type-right {
+				flex-direction: row-reverse;
+			}
+
+			&.right {
+				flex-direction: row-reverse;
+
+				.content {
+					background-color: $uni-color-success;
+					margin-right: 28rpx;
+					word-break: break-all;
+					line-height: 36rpx;
+					position: relative;
+
+					&::after {
+						content: '';
+						display: block;
+						width: 0;
+						height: 0;
+						border-top: 10rpx solid transparent;
+						border-bottom: 10rpx solid transparent;
+						border-left: 16rpx solid $uni-color-success;
+						position: absolute;
+						right: -16rpx;
+						top: 30rpx;
+					}
+				}
+			}
+
+			&.left {
+				.content {
+					background-color: $uni-text-color-inverse;
+					margin-left: 28rpx;
+					word-break: break-all;
+					line-height: 36rpx;
+					position: relative;
+
+					&::after {
+						content: '';
+						display: block;
+						width: 0;
+						height: 0;
+						border-top: 10rpx solid transparent;
+						border-bottom: 10rpx solid transparent;
+						border-right: 16rpx solid $uni-text-color-inverse;
+						position: absolute;
+						left: -16rpx;
+						top: 30rpx;
+					}
+				}
+			}
+		}
+	}
+
+	.input-box {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		box-sizing: content-box;
+		z-index: 999;
+		background-color: #eaeaea;
+
+		/* #ifdef APP-PLUS */
+		margin-bottom: 0rpx;
+		margin-bottom: constant(safe-area-inset-bottom);
+		margin-bottom: env(safe-area-inset-bottom);
+		/* #endif */
+		/* #ifdef MP-WEIXIN */
+		padding-bottom: 0rpx;
+		padding-bottom: constant(safe-area-inset-bottom);
+		padding-bottom: env(safe-area-inset-bottom);
+		/* #endif */
+
+		&-flex {
+			display: flex;
+			justify-content: flex-start;
+			align-items: center;
+			flex-wrap: nowrap;
+			flex-direction: row;
+			padding: 0 20rpx;
+			height: 130rpx;
+
+			.icon_img {
+				width: 56rpx;
+				height: 56rpx;
+				margin-right: 20rpx;
+			}
+
+			&-grow {
+				flex-grow: 1;
+
+				.content {
+					background-color: #fff;
+					height: 80rpx;
+					padding: 0 20rpx;
+					border-radius: 12rpx;
+					font-size: 28rpx;
+					caret-color: $uni-color-success;
+				}
+
+				.voice_title {
+					text-align: center;
+					background-color: #ffffff;
+					height: 80rpx;
+					line-height: 80rpx;
+					border-radius: 12rpx;
+				}
+			}
+
+			.btn {
+				margin-left: 20rpx;
+				background-color: $u-type-success;
+				border: none;
+				// height: 60rpx;
+			}
+		}
+	}
+
+	.input-box-mpInputMargin {
+		/* #ifdef MP */
+		padding-bottom: 0rpx;
+		/* #endif */
+	}
+	.voice_an{
+		width: 300rpx;
+		height: 300rpx;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-45%,-50%);
+		background-color: rgba(41,41,41,0.7);
+		color: white;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		border-radius: 10rpx;
+		.text{
+			padding-top: 30rpx;
+		}
+		@keyframes runVoice{
+			0%{
+				height: 10%;
+			}
+			20%{
+				height: 50%;
+			}
+			50%{
+				height: 100%;
+			}
+			80%{
+				height: 50%;
+			}
+			100%{
+				height: 0%;
+			}
+		}	
+		.wave{
+			width:6rpx;
+			height: 100%;
+			margin-left: 10rpx;
+			border-radius: 50rpx;
+			background-color: #999;
+			vertical-align: middle;
+			display: inline-block;
+		}
+		.voice_an_icon{
+			width: 200rpx;
+			height: 100rpx;
+			line-height: 50rpx;
+			margin: 50rpx 0;
+		}
+		.voice_an_icon #one{
+			animation:runVoice 0.6s infinite 0.1s;
+		}
+		.voice_an_icon #two{
+			animation:runVoice 0.6s infinite 0.3s;
+		}
+		.voice_an_icon #three{
+			animation:runVoice 0.6s infinite 0.6s;
+		}
+		.voice_an_icon #four{
+			animation:runVoice 0.6s infinite 0.1s;
+		}
+		.voice_an_icon #five{
+			animation:runVoice 0.6s infinite 0.3s;
+		}
+		.voice_an_icon #six{
+			animation:runVoice 0.6s infinite 0.6s;
+		}
+		.voice_an_icon #seven{
+			animation:runVoice 0.6s infinite 0.1s;
+		}
+	}
+}

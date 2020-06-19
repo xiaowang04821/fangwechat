@@ -4,7 +4,7 @@
 		<u-index-list :scrollTop="scrollTop" :index-list="indexList" :active-color="'#3CC51F'">
 			<view v-for="(item, index) in indexList" :key="index">
 				<u-index-anchor :index="item" />
-				<view v-for="user in firendList" :key="user.userId"  class="list-cell" @tap="linkToCard(user)">
+				<view v-for="user in firendList" :key="user.userId"  class="list-cell" @tap="linkToCard(user)" hover-class="message-hover-class">
 					<image mode="aspectFill" :src="user.headImg" />
 					<view  class="list-cell-name">{{user.userName}}</view>
 				</view>
