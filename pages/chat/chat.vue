@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<view class="content-box" @touchstart="touchstart" id="content-box">
+		<view class="content-box" @touchstart="touchstart" id="content-box" :class="{'content-showfn':showFunBtn}">
 			<!-- 背景图- 定位方式 -->
 			<image class="content-box-bg" :src="_user_info.chatBgImg" :style="{ height: imgHeight }"></image>
 			<view class="content-box-loading" v-if="!loading"><u-loading mode="flower"></u-loading></view>
@@ -29,19 +29,28 @@
 						></view>
 						<view class="">{{ item.contentDuration }}''</view>
 					</view>
+					<!-- contentType = 3 图片 -->
+					<view 
+						class="content contentType3" 	
+						v-if="item.contentType == 3"
+						@tap="viewImg([item.content])"
+					>
+						<image :src="item.content" class="img" mode="widthFix"></image>
+					</view>
 				</view>
-			</view>
+			</view> 
 		</view>
+		
 		<!-- 底部聊天输入框 -->
 		<view class="input-box" :class="{ 'input-box-mpInputMargin': mpInputMargin }">
 			<view class="input-box-flex">
 				<!-- #ifndef H5 -->
-				<image v-if="chatType === 'voice'" class="icon_img" :src="require('@/static/voice.png')" mode="" @click="switchChatType('keyboard')"></image>
-				<image v-if="chatType === 'keyboard'" class="icon_img" :src="require('@/static/keyboard.png')" mode="" @click="switchChatType('voice')"></image>
+				<image v-if="chatType === 'voice'" class="icon_img" :src="require('@/static/voice.png')"  @click="switchChatType('keyboard')"></image>
+				<image v-if="chatType === 'keyboard'" class="icon_img" :src="require('@/static/keyboard.png')"  @click="switchChatType('voice')"></image>
 				<!-- #endif -->
-				<view class="input-box-flex-grow">
+				<view class="input-box-flex-grow"> 
 					<input
-						v-if="chatType === 'keyboard'"
+						v-if="chatType === 'voice'"
 						type="text"
 						class="content"
 						id="input"
@@ -50,12 +59,12 @@
 						:confirm-type="'send'"
 						:confirm-hold="true"
 						placeholder-style="color:#DDDDDD;"
-						:cursor-spacing="6"
+						:cursor-spacing="10"
 						@confirm="sendMsg(null)"
 					/>
 					<view
 						class="voice_title"
-						v-if="chatType === 'voice'"
+						v-if="chatType === 'keyboard'"
 						:style="{ background: recording ? '#c7c6c6' : '#FFFFFF' }"
 						@touchstart.stop.prevent="startVoice"
 						@touchmove.stop.prevent="moveVoice"
@@ -65,10 +74,24 @@
 						{{ voiceTitle }}
 					</view>
 				</view>
-				<!-- #ifdef H5 || MP-WEIXIN --> 
+				
+				<!-- 功能性按钮 -->
+				<image class=" icon_btn_add" :src="require('@/static/add.png')" @tap="switchFun"></image>
+				
+				<!-- #ifdef H5 --> 
 				<button class="btn" type="primary" size="mini" @touchend.prevent="sendMsg(null)">发送</button>
 				<!-- #endif -->
 			</view>
+			
+			<view class="fun-box" :class="{'show-fun-box':showFunBtn}">
+				<u-grid :col="4"  hover-class="contentType2-hover-class" :border="false" @click="clickGrid">
+					<u-grid-item v-for="(item, index) in funList" :index="index" :key="index" bg-color="#eaeaea">
+						<u-icon :name="item.icon" :size="52"></u-icon>
+						<view class="grid-text">{{ item.title }}</view>
+					</u-grid-item>
+				</u-grid>
+			</view>
+
 		</view>
 		
 		<!-- //语音动画 -->
@@ -101,7 +124,7 @@ export default {
 			loading: true, //标识是否正在获取数据
 			imgHeight: '1000px',
 			mpInputMargin: false, //适配微信小程序 底部输入框高度被顶起的问题
-			chatType:"keyboard",  // 'voice'语音 'keyboard'键盘
+			chatType:"voice",  // 图标类型 'voice'语音 'keyboard'键盘
 			voiceTitle: '按住 说话',
 			Recorder: uni.getRecorderManager(),
 			Audio: uni.createInnerAudioContext(),
@@ -111,7 +134,13 @@ export default {
 			voiceTime:0, //总共录音时长
 			canSend:true, //是否可以发送
 			PointY:0, //坐标位置
-			voiceIconText:"正在录音..."
+			voiceIconText:"正在录音...",
+			showFunBtn:false, //是否展示功能型按钮
+			AudioExam:null, //正在播放音频的实例
+			funList: [
+				{ icon:"photo-fill",title:"照片",uploadType:["album"] },
+				{ icon:"camera-fill",title:"拍摄",uploadType:["camera"] },
+			],
 		};
 	},
 	methods: {
@@ -183,6 +212,13 @@ export default {
 		//切换语音或者键盘方式
 		switchChatType(type) {
 			this.chatType = type;
+			this.showFunBtn =false;
+		},
+		//切换功能性按钮
+		switchFun(){
+			this.chatType = 'keyboard'
+			this.showFunBtn = !this.showFunBtn;
+			uni.hideKeyboard()
 		},
 		//发送消息
 		sendMsg(data) {
@@ -197,14 +233,16 @@ export default {
 			};
 
 			if (data) {
-				//说明是发送语音
 				if(data.contentType == 2){
+					//说明是发送语音
 					params.content = data.content;
 					params.contentType = data.contentType;
 					params.contentDuration = data.contentDuration;
 					params.anmitionPlay = false;
 				}else if(data.contentType == 3){
-					// --
+					//发送图片
+					params.content = data.content;
+					params.contentType = data.contentType;
 				}
 			} else if (!this.$u.trim(this.formData.content)) {
 				//验证输入框书否为空字符传
@@ -215,19 +253,37 @@ export default {
 
 			this.$nextTick(() => {
 				this.formData.content = '';
-				uni.pageScrollTo({
-					scrollTop: 99999,
-					// #ifdef MP-WEIXIN
-					duration: 0, //小程序如果有滚动效果 input的焦点也会随着页面滚动...
-					// #endif
-					// #ifndef MP-WEIXIN
-					duration: 100
-					// #endif
-				});
 				// #ifdef MP-WEIXIN
+					if(params.contentType == 1){
+						uni.pageScrollTo({
+							scrollTop: 99999,
+							duration: 0, //小程序如果有滚动效果 input的焦点也会随着页面滚动...
+						});
+					}else{
+						setTimeout(()=>{
+							uni.pageScrollTo({
+								scrollTop: 99999,
+								duration: 0, //小程序如果有滚动效果 input的焦点也会随着页面滚动...
+							});
+						},150)
+					}
+				// #endif
+					
+				// #ifndef MP-WEIXIN
+					uni.pageScrollTo({
+						scrollTop: 99999,
+						duration: 100
+					});
+				// #endif
+				
+				if(this.showFunBtn){
+					this.showFunBtn = false;
+				}
+				
+				// #ifdef MP-WEIXIN 
 				if (params.contentType == 1) {
 					this.mpInputMargin = true;
-				}
+				} 
 				// #endif
 				//h5浏览器并没有很好的办法控制键盘一直处于唤起状态 而且会有样式性的问题
 				// #ifdef H5
@@ -250,6 +306,10 @@ export default {
 		},
 		//准备开始录音
 		startVoice(e) {
+			if(!this.Audio.paused){
+				//如果音频正在播放 先暂停。
+				this.stopAudio(this.AudioExam)
+			}
 			this.recording = true;
 			this.isStopVoice = false;
 			this.canSend = true;
@@ -334,6 +394,7 @@ export default {
 		},
 		//控制播放还是暂停音频文件
 		handleAudio(item) {
+			this.AudioExam = item;
 			this.Audio.paused ? this.playAudio(item) : this.stopAudio(item);
 		},
 		//播放音频
@@ -354,7 +415,41 @@ export default {
 			const hasBeenSentId = this.Audio.hasBeenSentId;
 			const item = this.messageList.find(it => it.hasBeenSentId == hasBeenSentId);
 			item.anmitionPlay = false;
-		}
+		},
+		//点击宫格时触发
+		clickGrid(index){
+			if(index == 0){
+				this.chooseImage(['album'])
+			}else if(index == 1){
+				this.chooseImage(['camera'])
+			}
+		},
+		//发送图片
+		chooseImage(sourceType){
+			uni.chooseImage({
+				sourceType,
+				sizeType:['compressed'], 
+				success:res=>{ 
+					this.showFunBtn = false;
+					for(let i = 0;i<res.tempFilePaths.length;i++){
+						const params = {
+							contentType: 3,
+							content: res.tempFilePaths[i],
+						};
+						this.sendMsg(params)
+					}
+				}
+			})
+		},
+		//查看大图
+		viewImg(imgList){
+			uni.previewImage({
+				urls: imgList,
+				// #ifndef MP-WEIXIN
+				indicator: 'number'
+				// #endif
+			});
+		},
 	},
 	onPageScroll(e) {
 		if (e.scrollTop < 50) {
@@ -429,14 +524,16 @@ export default {
 				this.imgHeight = res.windowHeight + 'px';
 			}
 		});
-
-		// #ifdef MP-WEIXIN
+		
 		uni.onKeyboardHeightChange(res => {
 			if (res.height == 0) {
+				// #ifdef MP-WEIXIN
 				this.mpInputMargin = false;
+				// #endif
+			}else{
+				this.showFunBtn = false;
 			}
 		});
-		// #endif
 	}
 };
 </script>

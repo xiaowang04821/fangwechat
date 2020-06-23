@@ -24,7 +24,10 @@
 		background-color: $uni-bg-color-hover !important;
 	}
 	.contentType2-hover-class{ //语音信息点击
-		background-color: #18B566 !important;
+		background-color: #c7c6c6 !important;
+	}
+	image{
+		will-change: transform;
 	}
 	.u-actionsheet-cancel,
 	.u-action-sheet-itemz{

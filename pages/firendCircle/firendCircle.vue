@@ -1,10 +1,8 @@
 <template>
 	<view class="content" id="content">
 		<!-- #ifdef MP-WEIXIN -->
-		<u-navbar title=" " :background="{ background: '#f8f8f8'}" :border-bottom="false">
-			<view class="slot-wrap" slot="right">
-				<u-icon name="camera-fill" size="36" @click="linkToRelease"></u-icon>
-			</view>		
+		<u-navbar title=" " :background="{ background: '#f8f8f8' }" :border-bottom="false">
+			<view class="slot-wrap" slot="right"><u-icon name="camera-fill" size="36" @click="linkToRelease"></u-icon></view>
 		</u-navbar>
 		<!-- #endif -->
 		<view class="content-imgbox">
@@ -45,8 +43,8 @@
 					<view class="relavivetime" :id="`comment-${'null'}-${index}`">
 						<view class="time">{{ item.createTime }}</view>
 						<view class="icon-box">
-							<view @tap="clickThumb(item)"> 
-								<image class="img icon-box-item thumb"  :src="item.isPraise?require('@/static/like-fill.png'):require('@/static/like.png')" mode=""></image>
+							<view @tap="clickThumb(item)">
+								<image class="img icon-box-item thumb" :src="item.isPraise ? require('@/static/like-fill.png') : require('@/static/like.png')" mode=""></image>
 							</view>
 							<view @tap="handleComment(item.circleMegId, null, index)">
 								<image class="img icon-box-item" :src="require('@/static/comment.png')" mode=""></image>
@@ -56,7 +54,7 @@
 					<!-- 点赞人 评论 -->
 					<view class="msg-box">
 						<view class="thumbinfo" v-if="item.praise.length">
-							<image class="thumbinfo-icon" :src="require('@/static/like.png')" ></image>
+							<image class="thumbinfo-icon" :src="require('@/static/like.png')"></image>
 							<text class="thumbinfo-name" v-for="(userInfo, index) in item.praise" :key="userInfo.id" @tap="linkToBusinessCard(userInfo.id)">
 								{{ userInfo.userName }}{{ index != item.praise.length - 1 ? '，' : '' }}
 							</text>
@@ -91,7 +89,12 @@
 		</view>
 
 		<!-- 底部聊天输入框 其实可以封装成组件的...-->
-		<view class="input-box" v-if="showInput" id="input-box" :style="{ bottom: inputOffsetBottom > 0 ? inputOffsetBottom + 'px' : '0' }" >
+		<!-- #ifdef MP-WEIXIN -->
+		<view class="input-box" v-if="showInput" id="input-box" :style="{ bottom: inputOffsetBottom > 0 ? inputOffsetBottom + 'px' : '0' }">
+		<!-- #endif -->
+		<!-- #ifndef MP-WEIXIN -->
+		<view class="input-box" v-show="showInput" id="input-box" :style="{ bottom: inputOffsetBottom > 0 ? inputOffsetBottom + 'px' : '0' }">
+		<!-- #endif -->
 			<view class="input-box-flex">
 				<view class="input-box-flex-grow">
 					<input
@@ -121,13 +124,11 @@
 <script>
 import { mapGetters } from 'vuex';
 export default {
-	name:"firendCircle",
+	name: 'firendCircle',
 	data() {
 		return {
 			show: false, //u-action-sheet  show
-			list: [
-				{ text: '更换相册封面', fontSize: '28' },
-			],
+			list: [{ text: '更换相册封面', fontSize: '28' }],
 			content: '',
 			placeholder: '',
 			showInput: false,
@@ -136,7 +137,7 @@ export default {
 			commentInfo: {},
 			inputOffsetBottom: 0, //键盘的高度
 			viewOffsetBottom: 0, //视窗距离页面的距离
-			sel: '', //选中的节点
+			sel: '' //选中的节点
 		};
 	},
 	watch: {
@@ -176,7 +177,7 @@ export default {
 				item.praise.push({ id: this._user_info.id, userName: this._user_info.userName });
 			} else {
 				const index = item.praise.findIndex(i => i.id == this._user_info.id);
-				item.praise.splice(index, 1); 
+				item.praise.splice(index, 1);
 			}
 		},
 		//跳转到名片
@@ -209,7 +210,7 @@ export default {
 			} else {
 				this.sel = `#comment-${'null'}-${index}`;
 			}
-			this.showInput = true;	
+			this.showInput = true;
 		},
 		//发送消息
 		sendMsg() {
@@ -257,7 +258,6 @@ export default {
 					uni.createSelectorQuery()
 						.select(sel)
 						.boundingClientRect(res => {
-							console.log(res);
 							if (!res) return;
 							//选中的节点
 							let windowHeight = 0;
@@ -325,7 +325,7 @@ export default {
 			}
 		},
 		//点击自定义组件相机按钮
-		linkToRelease(){
+		linkToRelease() {
 			this.$u.route('pages/releaseFirendCircle/releaseFirendCircle');
 		}
 	},
@@ -346,7 +346,6 @@ export default {
 				// #ifndef MP-WEIXIN
 				this.showInput = false;
 				// #endif
-
 			}
 		});
 	},
@@ -369,7 +368,6 @@ image {
 	will-change: transform;
 }
 .content {
-
 	&-imgbox {
 		position: relative;
 		.bgimg {
@@ -508,7 +506,7 @@ image {
 							margin-right: 10rpx;
 						}
 					}
-					.img{
+					.img {
 						width: 34rpx;
 						height: 34rpx;
 					}
@@ -524,12 +522,12 @@ image {
 		width: 100%;
 		box-sizing: content-box;
 		z-index: 999;
-		background-color: $uni-bg-color-grey;
-		
+		background-color: #eaeaea;
+
 		/* #ifdef MP-WEIXIN */
-		padding-bottom: 0rpx;
+		padding-bottom: 0rpx; 
 		/* #endif */
-		
+
 		/* #ifndef MP-WEIXIN */
 		margin-bottom: 0rpx;
 		margin-bottom: constant(safe-area-inset-bottom);
@@ -573,7 +571,7 @@ image {
 	.slot-wrap {
 		display: flex;
 		align-items: center;
-		padding: 0 30rpx; 
+		padding: 0 30rpx;
 	}
 }
 </style>
